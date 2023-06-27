@@ -7,6 +7,9 @@ export default function PokedexScreen() {
 
   const [pokemons, setPokemons] = useState([]);
 
+  //Nos sirve para mandar a llamar a  otra peticion al momento de hacer un reload
+  const [nextUrl, setNextUrl] = useState(null)
+
   //console.log(pokemons);
 
   useEffect(() => {
@@ -19,9 +22,13 @@ export default function PokedexScreen() {
   const loadPokemons = async () => {
 
     try {
-      const response = await getPokemonsApi();
+      const response = await getPokemonsApi(nextUrl);
+
+      //console.log(response.next);
+
+      setNextUrl(response.next);
       //console.log(response);      
-      
+
       const pokemonsArray = [];
 
       for await (const poke of response.results) {
@@ -33,7 +40,7 @@ export default function PokedexScreen() {
           name: pokemonDetail.name,
           type: pokemonDetail.types[0].type.name,
           order: pokemonDetail.order,
-          image: pokemonDetail.sprites.other['official-artwork'].front_default
+          image: pokemonDetail.sprites.other['official-artwork'].front_default,
         });
       }
 
@@ -49,7 +56,11 @@ export default function PokedexScreen() {
 
   return (
     <SafeAreaView>
-      <PokemonList listPokemon={pokemons} />
+      <PokemonList
+        listPokemon={pokemons}
+        loadPokemons={loadPokemons}
+        isNext={nextUrl}
+      />
     </SafeAreaView>
   )
 }

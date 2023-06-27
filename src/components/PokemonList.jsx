@@ -1,10 +1,17 @@
-import { FlatList, Text, StyleSheet } from 'react-native'
+import { FlatList, Text, StyleSheet, Platform } from 'react-native'
 import React from 'react'
 import PokemonCard from './PokemonCard';
+import { ActivityIndicator } from 'react-native-paper';
 
-export default function PokemonList({ listPokemon }) {
+export default function PokemonList({ listPokemon, loadPokemons, isNext }) {
 
-    console.log(listPokemon);
+    //console.log(listPokemon);
+
+    const loadMore = () => {
+        //console.log('Cargando mas elementos....');
+
+        loadPokemons();
+    }
 
     return (
         <FlatList
@@ -15,12 +22,31 @@ export default function PokemonList({ listPokemon }) {
             //renderItem={({ item }) => <Text> {item.name} </Text>}
             renderItem={({ item }) => <PokemonCard pokemonItem={item} />}
             contentContainerStyle={styles.flatListContentContainer}
+            onEndReached={isNext && loadMore}
+            onEndReachedThreshold={0.1}
+            ListFooterComponent={
+
+                isNext && (
+
+                    <ActivityIndicator
+                        size='large'
+                        style={styles.spinner}
+                        color='#AEAEAE'
+                    />
+                )
+
+            }
         />
     )
 }
 
 const styles = StyleSheet.create({
     flatListContentContainer: {
-        paddingHorizontal: 5
+        paddingHorizontal: 5,
+        marginTop: Platform === 'android' ? 30 : 0,
+    },
+    spinner: {
+        marginTop: 20,
+        marginBottom: Platform.OS === 'android' ? 90 : 60,
     }
 });
